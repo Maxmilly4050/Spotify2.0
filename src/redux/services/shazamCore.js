@@ -1,12 +1,31 @@
-const options = {
-  method: 'GET',
-  headers: {
-    'x-rapidapi-key': '3df89369a1msh896ceb0bc9301f4p1c673ajsn0c8416e8657d',
-    'x-rapidapi-host': 'shazam-core.p.rapidapi.com'
-  }
-};
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-fetch('https://shazam-core.p.rapidapi.com/v0/charts/genre-world?genre_code=POP&country_code=DZ', options)
-  .then(response => response.json())
-  .then(response => console.log(response))
-  .catch(err => console.error(err));
+// This code defines a Redux API service using RTK Query to interact with the Shazam Core API.
+  export const shazamCoreApi = createApi({
+    reducerPath: 'shazamCoreApi',
+    baseQuery: fetchBaseQuery({
+        baseUrl: 'https://shazam-core.p.rapidapi.com/v0',
+        prepareHeaders: (headers) => {
+            headers.set('x-rapidapi-key', '3df89369a1msh896ceb0bc9301f4p1c673ajsn0c8416e8657d');
+            headers.set('x-rapidapi-host', 'shazam-core.p.rapidapi.com');
+            return headers;
+        },
+    }),
+    endpoints: (builder) => ({
+        getTopCharts: builder.query({ query: () => '/charts/world' }),
+        getSongDetails: builder.query({ query: (songId) => `/tracks/details?track_id=${songId}` }),
+        getSongRelated: builder.query({ query: (songId) => `/tracks/related?track_id=${songId}` }),
+        getArtistDetails: builder.query({ query: (artistId) => `/artists/details?artist_id=${artistId}` }),
+        getSongsByGenre: builder.query({ query: (genre) => `/charts/genre-world?genre_code=${genre}` }),
+    })
+});
+// Export hooks for the defined endpoints
+export const {
+    useGetTopChartsQuery,
+    useGetSongDetailsQuery,
+    useGetSongRelatedQuery,
+    useGetArtistDetailsQuery,
+    useGetSongsByGenreQuery
+} = shazamCoreApi;
+// Export the API service to be used in the Redux store
+export { shazamCoreApi };
